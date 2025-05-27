@@ -1,14 +1,15 @@
 {
-  "vendor": "vtex",
+  "vendor": "pumaindustrial",
   "name": "structured-data",
-  "version": "0.15.0",
+  "version": "0.0.1",
   "title": "Structured data",
   "description": "Structured data",
   "defaultLocale": "pt-BR",
   "builders": {
     "react": "3.x",
     "docs": "0.x",
-    "messages": "1.x"
+    "messages": "1.x",
+    "store": "0.x"
   },
   "mustUpdateAt": "2019-08-29",
   "scripts": {
@@ -17,6 +18,13 @@
   "dependencies": {
     "vtex.render-runtime": "8.x",
     "vtex.apps-graphql": "3.x"
+  },
+  "store": {
+    "home": {
+      "blocks": [
+        "structured-data"
+      ]
+    }
   },
   "settingsSchema": {
     "title": "Structured data",
@@ -80,6 +88,30 @@
         ],
         "default": "ean",
         "description": "Set the value used for GTIN"
+      },
+      "organizationName": {
+        "title": "Organization Name",
+        "type": "string",
+        "default": "",
+        "description": "Name of your organization for schema.org"
+      },
+      "organizationLogo": {
+        "title": "Organization Logo",
+        "type": "string",
+        "default": "",
+        "description": "URL of your organization logo"
+      },
+      "organizationUrl": {
+        "title": "Organization URL",
+        "type": "string",
+        "default": "",
+        "description": "URL of your organization website"
+      },
+      "organizationDescription": {
+        "title": "Organization Description",
+        "type": "string",
+        "default": "",
+        "description": "Description of your organization"
       }
     }
   },

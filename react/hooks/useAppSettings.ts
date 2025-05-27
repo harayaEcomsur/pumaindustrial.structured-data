@@ -9,6 +9,10 @@ const DEFAULT_USE_SELLER_DEFAULT = false
 const DEFAULT_USE_IMAGES_ARRAY = false
 const DEFAULT_DISABLE_AGGREGATE_OFFER = false
 const DEFAULT_GTIN_VALUE = 'ean'
+const DEFAULT_ORGANIZATION_NAME = ''
+const DEFAULT_ORGANIZATION_LOGO = ''
+const DEFAULT_ORGANIZATION_URL = ''
+const DEFAULT_ORGANIZATION_DESCRIPTION = ''
 
 interface Settings {
   disableOffers: boolean
@@ -18,6 +22,10 @@ interface Settings {
   useImagesArray: boolean
   disableAggregateOffer: boolean
   gtinValue?: string
+  organizationName: string
+  organizationLogo: string
+  organizationUrl: string
+  organizationDescription: string
 }
 
 const useAppSettings = (): Settings => {
@@ -31,7 +39,11 @@ const useAppSettings = (): Settings => {
       useSellerDefault,
       useImagesArray,
       disableAggregateOffer,
-      gtinValue
+      gtinValue,
+      organizationName,
+      organizationLogo,
+      organizationUrl,
+      organizationDescription
     } = JSON.parse(data.publicSettingsForApp.message)
 
     return {
@@ -42,7 +54,11 @@ const useAppSettings = (): Settings => {
       useImagesArray: useImagesArray || DEFAULT_USE_IMAGES_ARRAY,
       disableAggregateOffer:
         disableAggregateOffer || DEFAULT_DISABLE_AGGREGATE_OFFER,
-      gtinValue: gtinValue || DEFAULT_GTIN_VALUE
+      gtinValue: gtinValue || DEFAULT_GTIN_VALUE,
+      organizationName: organizationName || DEFAULT_ORGANIZATION_NAME,
+      organizationLogo: organizationLogo || DEFAULT_ORGANIZATION_LOGO,
+      organizationUrl: organizationUrl || DEFAULT_ORGANIZATION_URL,
+      organizationDescription: organizationDescription || DEFAULT_ORGANIZATION_DESCRIPTION
     }
   }
 
@@ -53,7 +69,11 @@ const useAppSettings = (): Settings => {
     useSellerDefault: DEFAULT_USE_SELLER_DEFAULT,
     useImagesArray: DEFAULT_USE_IMAGES_ARRAY,
     disableAggregateOffer: DEFAULT_DISABLE_AGGREGATE_OFFER,
-    gtinValue: DEFAULT_GTIN_VALUE
+    gtinValue: DEFAULT_GTIN_VALUE,
+    organizationName: DEFAULT_ORGANIZATION_NAME,
+    organizationLogo: DEFAULT_ORGANIZATION_LOGO,
+    organizationUrl: DEFAULT_ORGANIZATION_URL,
+    organizationDescription: DEFAULT_ORGANIZATION_DESCRIPTION
   }
 }
 

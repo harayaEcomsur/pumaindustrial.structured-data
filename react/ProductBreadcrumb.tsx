@@ -1,6 +1,8 @@
 import React, { FC } from 'react'
 import { BreadcrumbList, ListItem } from 'schema-dts'
 import { jsonLdScriptProps } from 'react-schemaorg'
+import { Helmet } from 'react-helmet'
+
 
 import { getBaseUrl } from './modules/baseUrl'
 
@@ -64,7 +66,11 @@ const ProductBreadcrumbStructuredData: FC<Props> = ({
     return null
   }
 
-  return <script {...breadcrumbLD} />
+  return (
+    <Helmet>
+      <script {...breadcrumbLD} />
+    </Helmet>
+  )
 }
 
 export default ProductBreadcrumbStructuredData

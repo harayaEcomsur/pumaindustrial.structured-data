@@ -1,6 +1,5 @@
 query getSettings {
-  publicSettingsForApp(app: "vtex.structured-data", version: "0.x")
-    @context(provider: "vtex.apps-graphql") {
+  publicSettingsForApp(app: "pumaindustrial.structured-data") {
     message
   }
 }

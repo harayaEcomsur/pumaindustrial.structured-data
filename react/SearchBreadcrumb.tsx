@@ -1,5 +1,5 @@
 import React, { FC } from 'react'
-import { Helmet } from 'vtex.render-runtime'
+import { Helmet } from 'react-helmet'
 import { BreadcrumbList } from 'schema-dts'
 import { helmetJsonLdProp } from 'react-schemaorg'
 
