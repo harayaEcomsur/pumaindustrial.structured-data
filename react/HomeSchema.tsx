@@ -40,11 +40,11 @@ const HomeSchema: FC<Props> = () => {
   const websiteSchema: WithContext<WebSite> = {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
-    name: organizationName || 'Puma Safety',
+    name: 'Puma Safety',
     url: organizationUrl || baseUrl,
     potentialAction: {
       '@type': 'SearchAction',
-      target: `${organizationUrl || baseUrl}/search?q={search_term_string}`,
+      target: `{search_term_string}`,
       queryInput: 'required name=search_term_string',
     } as SearchAction,
   }

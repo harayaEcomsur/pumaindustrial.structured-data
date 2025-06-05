@@ -1,6 +1,5 @@
 import React, { memo } from 'react'
 import { useRuntime } from 'vtex.render-runtime'
-import { Helmet } from 'react-helmet'
 import { jsonLdScriptProps } from 'react-schemaorg'
 import { pathOr, path, sort, last, flatten } from 'ramda'
 import { ProductData, ParseToJsonLDParams, StructuredDataProps, Product, SelectedItem, Offer, AggregateOffer, Seller } from './typings/schema'
@@ -273,9 +272,7 @@ function StructuredData({ product, selectedItem }: StructuredDataProps) {
   }
 
   return (
-    <Helmet>
       <script {...jsonLdScriptProps(productLD as any)} />
-    </Helmet>
   )
 }
 
