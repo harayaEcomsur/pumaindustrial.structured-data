@@ -1,4 +1,4 @@
-import React, { memo } from 'react'
+import React, { memo, Suspense } from 'react'
 import { useRuntime } from 'vtex.render-runtime'
 import { jsonLdScriptProps } from 'react-schemaorg'
 import { pathOr, path, sort, last, flatten } from 'ramda'
@@ -239,7 +239,8 @@ export const parseToJsonLD = ({
   return productLD
 }
 
-function StructuredData({ product, selectedItem }: StructuredDataProps) {
+// Componente que maneja el schema
+const ProductContent: React.FC<StructuredDataProps> = ({ product, selectedItem }) => {
   const {
     culture: { currency },
   } = useRuntime()
@@ -271,8 +272,15 @@ function StructuredData({ product, selectedItem }: StructuredDataProps) {
     return null
   }
 
+  return <script {...jsonLdScriptProps(productLD as any)} />
+}
+
+// Componente principal con Suspense
+function StructuredData(props: StructuredDataProps) {
   return (
-      <script {...jsonLdScriptProps(productLD as any)} />
+    <Suspense fallback={null}>
+      <ProductContent {...props} />
+    </Suspense>
   )
 }
 

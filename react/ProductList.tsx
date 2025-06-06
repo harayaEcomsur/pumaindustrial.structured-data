@@ -1,8 +1,7 @@
-import React from 'react'
+import React, { Suspense } from 'react'
 import { jsonLdScriptProps } from 'react-schemaorg'
 import { ItemList, WithContext, ListItem } from 'schema-dts'
 import { useRuntime } from 'vtex.render-runtime'
-import { Helmet } from 'react-helmet'
 import { Product } from './typings/schema'
 import useAppSettings from './hooks/useAppSettings'
 import { parseToJsonLD } from './Product'
@@ -63,7 +62,8 @@ export function getProductList({
   } as WithContext<ItemList>
 }
 
-function ProductList({ products }: Props) {
+// Componente que maneja el schema
+const ProductListContent: React.FC<Props> = ({ products }) => {
   const {
     culture: { currency },
   } = useRuntime()
@@ -81,10 +81,15 @@ function ProductList({ products }: Props) {
     return null
   }
 
+  return <script {...jsonLdScriptProps<ItemList>(productListLD)} />
+}
+
+// Componente principal con Suspense
+function ProductList(props: Props) {
   return (
-    <Helmet>
-      <script {...jsonLdScriptProps<ItemList>(productListLD)} />
-    </Helmet>
+    <Suspense fallback={null}>
+      <ProductListContent {...props} />
+    </Suspense>
   )
 }
 
