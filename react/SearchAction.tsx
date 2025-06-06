@@ -20,13 +20,14 @@ const SearchActionContent: React.FC<Props> = ({ searchTermPath }) => {
         helmetJsonLdProp<WebSite>({
           '@context': 'https://schema.org',
           '@type': 'WebSite',
+          name: 'Puma Safety',
           url: baseUrl,
           potentialAction: {
             '@type': 'SearchAction',
-            target: `${baseUrl}${path}{search_term_string}?map=ft`,
+            target: `{search_term_string}`,
             // @ts-expect-error it's a valid property
             'query-input': 'required name=search_term_string',
-          },
+          }
         }),
       ]}
     />
