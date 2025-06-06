@@ -1,4 +1,5 @@
 import { useQuery } from 'react-apollo'
+
 import GET_SETTINGS from '../queries/getSettings.graphql'
 
 const DEFAULT_DISABLE_OFFERS = false
@@ -8,8 +9,8 @@ const DEFAULT_USE_SELLER_DEFAULT = false
 const DEFAULT_USE_IMAGES_ARRAY = false
 const DEFAULT_DISABLE_AGGREGATE_OFFER = false
 const DEFAULT_GTIN_VALUE = 'ean'
-const DEFAULT_ORGANIZATION_NAME = 'Puma Safety'
-const DEFAULT_ORGANIZATION_LOGO = 'https://pumaindustrial.vtexassets.com/arquivos/logo-puma-negro.png'
+const DEFAULT_ORGANIZATION_NAME = ''
+const DEFAULT_ORGANIZATION_LOGO = ''
 const DEFAULT_ORGANIZATION_URL = ''
 const DEFAULT_ORGANIZATION_DESCRIPTION = ''
 
@@ -20,7 +21,7 @@ interface Settings {
   useSellerDefault: boolean
   useImagesArray: boolean
   disableAggregateOffer: boolean
-  gtinValue: string
+  gtinValue?: string
   organizationName: string
   organizationLogo: string
   organizationUrl: string
@@ -28,10 +29,7 @@ interface Settings {
 }
 
 const useAppSettings = (): Settings => {
-  const { data } = useQuery(GET_SETTINGS, { 
-    ssr: true,
-    fetchPolicy: 'cache-first'
-  })
+  const { data } = useQuery(GET_SETTINGS, { ssr: true })
 
   if (data?.publicSettingsForApp?.message) {
     const {
@@ -49,17 +47,18 @@ const useAppSettings = (): Settings => {
     } = JSON.parse(data.publicSettingsForApp.message)
 
     return {
-      disableOffers: disableOffers ?? DEFAULT_DISABLE_OFFERS,
-      decimals: decimals ?? DEFAULT_DECIMALS,
-      pricesWithTax: pricesWithTax ?? DEFAULT_PRICES_WITH_TAX,
-      useSellerDefault: useSellerDefault ?? DEFAULT_USE_SELLER_DEFAULT,
-      useImagesArray: useImagesArray ?? DEFAULT_USE_IMAGES_ARRAY,
-      disableAggregateOffer: disableAggregateOffer ?? DEFAULT_DISABLE_AGGREGATE_OFFER,
-      gtinValue: gtinValue ?? DEFAULT_GTIN_VALUE,
-      organizationName: organizationName ?? DEFAULT_ORGANIZATION_NAME,
-      organizationLogo: organizationLogo ?? DEFAULT_ORGANIZATION_LOGO,
-      organizationUrl: organizationUrl ?? DEFAULT_ORGANIZATION_URL,
-      organizationDescription: organizationDescription ?? DEFAULT_ORGANIZATION_DESCRIPTION
+      disableOffers: disableOffers || DEFAULT_DISABLE_OFFERS,
+      decimals: decimals || DEFAULT_DECIMALS,
+      pricesWithTax: pricesWithTax || DEFAULT_PRICES_WITH_TAX,
+      useSellerDefault: useSellerDefault || DEFAULT_USE_SELLER_DEFAULT,
+      useImagesArray: useImagesArray || DEFAULT_USE_IMAGES_ARRAY,
+      disableAggregateOffer:
+        disableAggregateOffer || DEFAULT_DISABLE_AGGREGATE_OFFER,
+      gtinValue: gtinValue || DEFAULT_GTIN_VALUE,
+      organizationName: organizationName || DEFAULT_ORGANIZATION_NAME,
+      organizationLogo: organizationLogo || DEFAULT_ORGANIZATION_LOGO,
+      organizationUrl: organizationUrl || DEFAULT_ORGANIZATION_URL,
+      organizationDescription: organizationDescription || DEFAULT_ORGANIZATION_DESCRIPTION
     }
   }
 

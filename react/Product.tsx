@@ -1,6 +1,7 @@
-import React, { memo, Suspense } from 'react'
+import React, { memo } from 'react'
 import { useRuntime } from 'vtex.render-runtime'
 import { jsonLdScriptProps } from 'react-schemaorg'
+import { Helmet } from 'react-helmet'
 import { pathOr, path, sort, last, flatten } from 'ramda'
 import { ProductData, ParseToJsonLDParams, StructuredDataProps, Product, SelectedItem, Offer, AggregateOffer, Seller } from './typings/schema'
 import useAppSettings from './hooks/useAppSettings'
@@ -195,6 +196,10 @@ export const parseToJsonLD = ({
   const { brand } = product
   const name = product.productName
 
+  if (!name || !brand) {
+    return null
+  }
+
   const mpn =
     selectedItem?.referenceId?.[0]?.Value ||
     product?.productReference ||
@@ -219,10 +224,12 @@ export const parseToJsonLD = ({
   const rawGTIN = selectedItem?.[gtinValue || ''] || null
   const gtin = formatGTIN(rawGTIN)
 
+  const productUrl = `${baseUrl}/${product.linkText}/p`
+
   const productLD: ProductData = {
     '@context': 'https://schema.org/',
     '@type': 'Product',
-    '@id': `${baseUrl}/${product.linkText}/p`,
+    '@id': productUrl,
     name,
     brand: parseBrand(brand),
     image: useImagesArray
@@ -234,13 +241,13 @@ export const parseToJsonLD = ({
     category: category || null,
     offers: disableOffers ? null : offers,
     gtin,
+    url: productUrl,
   }
 
   return productLD
 }
 
-// Componente que maneja el schema
-const ProductContent: React.FC<StructuredDataProps> = ({ product, selectedItem }) => {
+function StructuredData({ product, selectedItem }: StructuredDataProps) {
   const {
     culture: { currency },
   } = useRuntime()
@@ -272,15 +279,15 @@ const ProductContent: React.FC<StructuredDataProps> = ({ product, selectedItem }
     return null
   }
 
-  return <script {...jsonLdScriptProps(productLD as any)} />
-}
+  // Asegurarnos de que el JSON-LD sea válido
+  const jsonLD = JSON.stringify(productLD)
 
-// Componente principal con Suspense
-function StructuredData(props: StructuredDataProps) {
   return (
-    <Suspense fallback={null}>
-      <ProductContent {...props} />
-    </Suspense>
+    <Helmet>
+      <script type="application/ld+json">
+        {jsonLD}
+      </script>
+    </Helmet>
   )
 }
 

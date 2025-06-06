@@ -1,18 +1,16 @@
-import React, { FC, Suspense } from 'react'
+import React, { FC } from 'react'
 import { Helmet } from 'react-helmet'
 import { BreadcrumbList } from 'schema-dts'
 import { helmetJsonLdProp } from 'react-schemaorg'
 
 import { getBaseUrl } from './modules/baseUrl'
 
-interface Props {
-  breadcrumb?: Array<{
-    name: string
-    href: string
-  }>
+interface SearchBreadcrumbItem {
+  name: string
+  href: string
 }
 
-const getSearchBreadcrumb = (breadcrumb?: Props['breadcrumb']) => {
+const getSearchBreadcrumb = (breadcrumb?: SearchBreadcrumbItem[]) => {
   if (!Array.isArray(breadcrumb) || breadcrumb?.length === 0) {
     return {}
   }
@@ -31,20 +29,14 @@ const getSearchBreadcrumb = (breadcrumb?: Props['breadcrumb']) => {
   })
 }
 
-// Componente que maneja el schema
-const SearchBreadcrumbContent: FC<Props> = ({ breadcrumb }) => {
+interface Props {
+  breadcrumb?: SearchBreadcrumbItem[]
+}
+
+const SearchBreadcrumbStructuredData: FC<Props> = ({ breadcrumb }) => {
   const breadcrumbLD = getSearchBreadcrumb(breadcrumb)
 
   return <Helmet script={[breadcrumbLD]} />
-}
-
-// Componente principal con Suspense
-const SearchBreadcrumbStructuredData: FC<Props> = (props) => {
-  return (
-    <Suspense fallback={null}>
-      <SearchBreadcrumbContent {...props} />
-    </Suspense>
-  )
 }
 
 export default SearchBreadcrumbStructuredData

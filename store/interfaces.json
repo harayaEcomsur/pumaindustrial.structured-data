@@ -1,5 +1,8 @@
 {
   "structured-data": {
     "component": "HomeSchema"
+  },
+  "product-structured-data": {
+    "component": "StructuredData"
   }
 } 

@@ -16,6 +16,7 @@ export interface ProductData extends SchemaProduct {
   category: string | null
   offers: AggregateOffer | Offer[] | null
   gtin: string | null
+  url: string
 }
 
 export interface AggregateOffer {

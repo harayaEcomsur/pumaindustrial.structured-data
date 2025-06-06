@@ -1,4 +1,4 @@
-import React, { Suspense } from 'react'
+import React from 'react'
 import { Helmet } from 'react-helmet'
 import { WebSite } from 'schema-dts'
 import { helmetJsonLdProp } from 'react-schemaorg'
@@ -9,8 +9,7 @@ interface Props {
   searchTermPath?: string
 }
 
-// Componente que maneja el schema
-const SearchActionContent: React.FC<Props> = ({ searchTermPath }) => {
+function SearchAction({ searchTermPath }: Props) {
   const baseUrl = getBaseUrl()
   const path = !searchTermPath ? '/' : searchTermPath
 
@@ -20,7 +19,6 @@ const SearchActionContent: React.FC<Props> = ({ searchTermPath }) => {
         helmetJsonLdProp<WebSite>({
           '@context': 'https://schema.org',
           '@type': 'WebSite',
-          name: 'Puma Safety',
           url: baseUrl,
           potentialAction: {
             '@type': 'SearchAction',
@@ -31,15 +29,6 @@ const SearchActionContent: React.FC<Props> = ({ searchTermPath }) => {
         }),
       ]}
     />
-  )
-}
-
-// Componente principal con Suspense
-function SearchAction(props: Props) {
-  return (
-    <Suspense fallback={null}>
-      <SearchActionContent {...props} />
-    </Suspense>
   )
 }
 

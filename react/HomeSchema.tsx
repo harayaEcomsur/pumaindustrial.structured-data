@@ -1,4 +1,4 @@
-import React, { FC, Suspense } from 'react'
+import React, { FC } from 'react'
 import { Helmet } from 'react-helmet'
 import { jsonLdScriptProps } from 'react-schemaorg'
 import { WebSite, WithContext, SearchAction } from 'schema-dts'
@@ -16,8 +16,7 @@ interface Props {
   }>
 }
 
-// Componente que maneja el schema
-const SchemaContent: FC = () => {
+const HomeSchema: FC<Props> = () => {
   const {
     organizationName,
     organizationLogo,
@@ -57,15 +56,6 @@ const SchemaContent: FC = () => {
       </script>
       <script {...jsonLdScriptProps<WebSite>(websiteSchema)} />
     </Helmet>
-  )
-}
-
-// Componente principal con Suspense
-const HomeSchema: FC<Props> = () => {
-  return (
-    <Suspense fallback={null}>
-      <SchemaContent />
-    </Suspense>
   )
 }
 
