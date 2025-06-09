@@ -19,10 +19,11 @@ function SearchAction({ searchTermPath }: Props) {
         helmetJsonLdProp<WebSite>({
           '@context': 'https://schema.org',
           '@type': 'WebSite',
+          name: 'Puma Safety',
           url: baseUrl,
           potentialAction: {
             '@type': 'SearchAction',
-            target: `${baseUrl}${path}{search_term_string}?map=ft`,
+            target: path === '/' ? `{search_term_string}` : `${baseUrl}${path}{search_term_string}?map=ft`,
             // @ts-expect-error it's a valid property
             'query-input': 'required name=search_term_string',
           },
