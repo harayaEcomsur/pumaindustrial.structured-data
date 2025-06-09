@@ -1,4 +1,4 @@
-import React, { memo } from 'react'
+import React, { memo, useEffect } from 'react'
 import { useRuntime } from 'vtex.render-runtime'
 import { jsonLdScriptProps } from 'react-schemaorg'
 import { Helmet } from 'react-helmet'
@@ -279,14 +279,19 @@ function StructuredData({ product, selectedItem }: StructuredDataProps) {
     return null
   }
 
-  // Asegurarnos de que el JSON-LD sea válido
-  const jsonLD = JSON.stringify(productLD)
+  useEffect(() => {
+    const existingScript = document.querySelector(`script[data-jsonld-id="${productLD['@id']}"]`)
+    if (existingScript) {
+      existingScript.remove()
+    }
+  }, [productLD['@id']])
 
   return (
     <Helmet>
-      <script type="application/ld+json">
-        {jsonLD}
-      </script>
+      <script 
+        {...jsonLdScriptProps(productLD as any)}
+        data-jsonld-id={productLD['@id']}
+      />
     </Helmet>
   )
 }

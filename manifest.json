@@ -120,5 +120,9 @@
       }
     }
   },
+  "vtexSSR": {
+    "enabled": true,
+    "priority": 1
+  },
   "$schema": "https://raw.githubusercontent.com/vtex/node-vtex-api/master/gen/manifest.schema"
 }
