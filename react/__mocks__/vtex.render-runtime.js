@@ -12,21 +12,15 @@ export const useRuntime = () => {
   }
 }
 
-export const Helmet = ({ title, meta }) => {
-  return (
-    <div>
-      <title>{title}</title>
-      {meta.map((m) => {
-        return (
-          <meta
-            key={m.name}
-            name={m.name}
-            content={m.content}
-            data-react-helmet
-            data-testid={m.name}
-          />
-        )
-      })}
-    </div>
-  )
+export const Helmet = ({ children, script }) => {
+  if (script) {
+    return (
+      <div>
+        {script.map((s, i) => (
+          <script key={i} {...s} />
+        ))}
+      </div>
+    )
+  }
+  return <div>{children}</div>
 }

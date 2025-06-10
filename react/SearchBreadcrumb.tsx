@@ -1,5 +1,5 @@
 import React, { FC } from 'react'
-import { Helmet } from 'react-helmet'
+import { Helmet } from 'vtex.render-runtime'
 import { BreadcrumbList } from 'schema-dts'
 import { helmetJsonLdProp } from 'react-schemaorg'
 
@@ -10,7 +10,7 @@ interface SearchBreadcrumbItem {
   href: string
 }
 
-const getSearchBreadcrumb = (breadcrumb?: SearchBreadcrumbItem[]) => {
+const getSearchBreadcrumb = (breadcrumb: SearchBreadcrumbItem[] | undefined) => {
   if (!Array.isArray(breadcrumb) || breadcrumb?.length === 0) {
     return {}
   }

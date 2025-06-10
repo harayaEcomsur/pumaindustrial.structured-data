@@ -1,7 +1,5 @@
 import React, { FC } from 'react'
-import { Helmet } from 'react-helmet'
-import { jsonLdScriptProps } from 'react-schemaorg'
-import { WebSite, WithContext, SearchAction } from 'schema-dts'
+import { Helmet } from 'vtex.render-runtime'
 import useAppSettings from './hooks/useAppSettings'
 import { getBaseUrl } from './modules/baseUrl'
 
@@ -37,7 +35,7 @@ const HomeSchema: FC<Props> = () => {
   }
 
   // Website Schema
-  const websiteSchema: WithContext<WebSite> = {
+  const websiteSchema = {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
     name: 'Puma Safety',
@@ -45,16 +43,18 @@ const HomeSchema: FC<Props> = () => {
     potentialAction: {
       '@type': 'SearchAction',
       target: `{search_term_string}`,
-      queryInput: 'required name=search_term_string',
-    } as SearchAction,
+      'query-input': 'required name=search_term_string',
+    }
   }
 
   return (
     <Helmet>
       <script type="application/ld+json">
+        {JSON.stringify(websiteSchema)}
+      </script>
+      <script type="application/ld+json">
         {JSON.stringify(organizationSchema)}
       </script>
-      <script {...jsonLdScriptProps<WebSite>(websiteSchema)} />
     </Helmet>
   )
 }

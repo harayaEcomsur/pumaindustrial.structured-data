@@ -4,7 +4,7 @@
   "version": "0.0.8",
   "title": "Structured data",
   "description": "Structured data",
-  "defaultLocale": "pt-BR",
+  "defaultLocale": "es-ES",
   "builders": {
     "react": "3.x",
     "docs": "0.x",
@@ -17,7 +17,12 @@
   },
   "dependencies": {
     "vtex.render-runtime": "8.x",
-    "vtex.apps-graphql": "3.x"
+    "vtex.apps-graphql": "3.x",
+    "vtex.store": "2.x",
+    "vtex.product-context": "0.x"
+  },
+  "vtexSSR": {
+    "priority": 0
   },
   "store": {
     "home": {
@@ -119,10 +124,6 @@
         "description": "Description of your organization"
       }
     }
-  },
-  "vtexSSR": {
-    "enabled": true,
-    "priority": 1
   },
   "$schema": "https://raw.githubusercontent.com/vtex/node-vtex-api/master/gen/manifest.schema"
 }

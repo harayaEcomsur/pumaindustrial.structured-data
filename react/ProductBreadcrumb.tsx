@@ -1,7 +1,7 @@
 import React, { FC } from 'react'
 import { BreadcrumbList, ListItem } from 'schema-dts'
 import { jsonLdScriptProps } from 'react-schemaorg'
-import { Helmet } from 'react-helmet'
+import { Helmet } from 'vtex.render-runtime'
 
 
 import { getBaseUrl } from './modules/baseUrl'

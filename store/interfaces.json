@@ -3,6 +3,6 @@
     "component": "HomeSchema"
   },
   "product-structured-data": {
-    "component": "StructuredData"
+    "component": "Product"
   }
 } 

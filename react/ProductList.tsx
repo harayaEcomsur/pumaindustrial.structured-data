@@ -2,9 +2,16 @@ import React from 'react'
 import { jsonLdScriptProps } from 'react-schemaorg'
 import { ItemList, WithContext, ListItem } from 'schema-dts'
 import { useRuntime } from 'vtex.render-runtime'
-import { Product } from './typings/schema'
+
 import useAppSettings from './hooks/useAppSettings'
 import { parseToJsonLD } from './Product'
+
+interface Product {
+  productName: string
+  linkText: string
+  link: string
+  items: unknown[]
+}
 
 interface Props {
   products?: Product[]
@@ -28,14 +35,7 @@ export function getProductList({
   }
 
   const productItems: ListItem[] = products.map((product, index) => {
-    const [selectedItem] = product.items || []
-    if (!selectedItem) {
-      return {
-        '@type': 'ListItem',
-        position: index + 1,
-      }
-    }
-
+    const [selectedItem] = product.items
     const item = parseToJsonLD({
       product,
       selectedItem,
@@ -43,9 +43,6 @@ export function getProductList({
       disableOffers,
       decimals,
       pricesWithTax,
-      useSellerDefault: false,
-      useImagesArray: false,
-      disableAggregateOffer: false,
     })
 
     return {
@@ -80,9 +77,7 @@ function ProductList({ products }: Props) {
     return null
   }
 
-  return (
-      <script {...jsonLdScriptProps<ItemList>(productListLD)} />
-  )
+  return <script {...jsonLdScriptProps<ItemList>(productListLD)} />
 }
 
 export default ProductList

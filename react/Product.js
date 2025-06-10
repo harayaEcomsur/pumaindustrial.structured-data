@@ -1,18 +1,22 @@
+/* eslint-disable react/jsx-filename-extension */
 import React, { memo, useEffect } from 'react'
 import { useRuntime } from 'vtex.render-runtime'
-import { jsonLdScriptProps } from 'react-schemaorg'
-import { Helmet } from 'react-helmet'
+import PropTypes from 'prop-types'
+// eslint-disable-next-line no-restricted-imports
 import { pathOr, path, sort, last, flatten } from 'ramda'
-import { ProductData, ParseToJsonLDParams, StructuredDataProps, Product, SelectedItem, Offer, AggregateOffer, Seller } from './typings/schema'
+import { jsonLdScriptProps } from 'react-schemaorg'
+import { Helmet } from 'vtex.render-runtime'
+import { useProduct } from 'vtex.product-context'
+
 import useAppSettings from './hooks/useAppSettings'
 import { getBaseUrl } from './modules/baseUrl'
 
-const getSpotPrice = (seller: Seller) => path(['commertialOffer', 'spotPrice'])(seller) as number
-const getPrice = (seller: Seller) => path(['commertialOffer', 'Price'])(seller) as number
-const getTax = (seller: Seller) => path(['commertialOffer', 'Tax'])(seller) as number
-const getAvailableQuantity = (seller: Seller) => pathOr(0, ['commertialOffer', 'AvailableQuantity'])(seller) as number
+const getSpotPrice = path(['commertialOffer', 'spotPrice'])
+const getPrice = path(['commertialOffer', 'Price'])
+const getTax = path(['commertialOffer', 'Tax'])
+const getAvailableQuantity = pathOr(0, ['commertialOffer', 'AvailableQuantity'])
 
-const getFinalPrice = (value: Seller, getPriceFunc: (seller: Seller) => number, { decimals, pricesWithTax }: { decimals: number; pricesWithTax: boolean }) => {
+const getFinalPrice = (value, getPriceFunc, { decimals, pricesWithTax }) => {
   return pricesWithTax
     ? Math.round(
         (getPriceFunc(value) + getTax(value) + Number.EPSILON) * 10 ** decimals
@@ -22,17 +26,17 @@ const getFinalPrice = (value: Seller, getPriceFunc: (seller: Seller) => number, 
 }
 
 const sortByPriceAsc = sort(
-  (itemA: Seller, itemB: Seller) => getSpotPrice(itemA) - getSpotPrice(itemB)
+  (itemA, itemB) => getSpotPrice(itemA) - getSpotPrice(itemB)
 )
 
 const sortByPriceWithTaxAsc = sort(
-  (itemA: Seller, itemB: Seller) =>
+  (itemA, itemB) =>
     getSpotPrice(itemA) + getTax(itemA) - (getSpotPrice(itemB) + getTax(itemB))
 )
 
-const isSkuAvailable = (sku: Seller) => getAvailableQuantity(sku) > 0
+const isSkuAvailable = (sku) => getAvailableQuantity(sku) > 0
 
-const lowHighForSellers = (sellers: Seller[], { pricesWithTax }: { pricesWithTax: boolean }) => {
+const lowHighForSellers = (sellers, { pricesWithTax }) => {
   const sortedByPrice = pricesWithTax
     ? sortByPriceWithTaxAsc(sellers)
     : sortByPriceAsc(sellers)
@@ -55,10 +59,10 @@ const lowHighForSellers = (sellers: Seller[], { pricesWithTax }: { pricesWithTax
 const IN_STOCK = 'http://schema.org/InStock'
 const OUT_OF_STOCK = 'http://schema.org/OutOfStock'
 
-const getSKUAvailabilityString = (seller: Seller) =>
+const getSKUAvailabilityString = (seller) =>
   isSkuAvailable(seller) ? IN_STOCK : OUT_OF_STOCK
 
-const formatGTIN = (gtin: string | null) => {
+const formatGTIN = (gtin) => {
   if (!gtin || typeof gtin !== 'string') return null
 
   const validLengths = [8, 12, 13, 14]
@@ -69,28 +73,27 @@ const formatGTIN = (gtin: string | null) => {
 }
 
 const parseSKUToOffer = (
-  item: SelectedItem,
-  currency: string,
-  { decimals, pricesWithTax, useSellerDefault }: { decimals: number; pricesWithTax: boolean; useSellerDefault: boolean }
-): Offer | null => {
-  const defaultSeller = getSellerDefault(item.sellers)
-  const seller = useSellerDefault && defaultSeller
-    ? defaultSeller
+  item,
+  currency,
+  { decimals, pricesWithTax, useSellerDefault }
+) => {
+  const seller = useSellerDefault
+    ? getSellerDefault(item.sellers)
     : lowHighForSellers(item.sellers, { pricesWithTax }).low
-
-  if (!seller) {
-    return null
-  }
 
   const availability = getSKUAvailabilityString(seller)
 
   const price = getFinalPrice(seller, getSpotPrice, { decimals, pricesWithTax })
 
+  // When a product is not available the API can't define its price and returns zero.
+  // If we set structured data product price as zero, Google will show that the
+  // product it's free (wrong info), but out of stock.
+  // It's better just not return any offer in that case.
   if (availability === OUT_OF_STOCK && price === 0) {
     return null
   }
 
-  const offer: Offer = {
+  const offer = {
     '@type': 'Offer',
     price,
     priceCurrency: currency,
@@ -100,49 +103,44 @@ const parseSKUToOffer = (
     priceValidUntil: path(['commertialOffer', 'PriceValidUntil'], seller),
     seller: {
       '@type': 'Organization',
-      name: seller.sellerName,
+      name: seller ? seller.sellerName : '',
     },
   }
 
   return offer
 }
 
-const getAllSellers = (items: SelectedItem[]): Seller[] => {
+const getAllSellers = (items) => {
   const allSellers = items.map((item) => item.sellers)
-  return flatten(allSellers) as unknown as Seller[]
+  const flat = flatten(allSellers)
+
+  return flat
 }
 
-const getSellerDefault = (sellers: Seller[]): Seller | undefined => {
-  return sellers.find((s) => s.sellerDefault)
+const getSellerDefault = (sellers) => {
+  const seller = sellers.find((s) => s.sellerDefault)
+
+  return seller
 }
 
 const composeAggregateOffer = (
-  product: Product,
-  currency: string,
-  { decimals, pricesWithTax, useSellerDefault, disableAggregateOffer }: { 
-    decimals: number; 
-    pricesWithTax: boolean; 
-    useSellerDefault: boolean; 
-    disableAggregateOffer: boolean 
-  }
-): AggregateOffer | Offer[] | null => {
+  product,
+  currency,
+  { decimals, pricesWithTax, useSellerDefault, disableAggregateOffer }
+) => {
   const items = product.items || []
   const allSellers = getAllSellers(items)
   const { low, high } = lowHighForSellers(allSellers, { pricesWithTax })
 
-  if (!low || !high) {
-    return null
-  }
-
   const offersList = items
-    .map((element: SelectedItem) =>
+    .map((element) =>
       parseSKUToOffer(element, currency, {
         decimals,
         pricesWithTax,
         useSellerDefault,
       })
     )
-    .filter((offer: Offer | null): offer is Offer => offer !== null)
+    .filter(Boolean)
 
   if (offersList.length === 0) {
     return null
@@ -152,7 +150,7 @@ const composeAggregateOffer = (
     return offersList
   }
 
-  const aggregateOffer: AggregateOffer = {
+  const aggregateOffer = {
     '@type': 'AggregateOffer',
     lowPrice: getFinalPrice(low, getSpotPrice, { decimals, pricesWithTax }),
     highPrice: getFinalPrice(high, getPrice, { decimals, pricesWithTax }),
@@ -164,14 +162,14 @@ const composeAggregateOffer = (
   return aggregateOffer
 }
 
-const getCategoryName = (product: Product) =>
+const getCategoryName = (product) =>
   product.categoryTree &&
   product.categoryTree.length > 0 &&
   product.categoryTree[product.categoryTree.length - 1].name
 
-function parseBrand(brand: string | { name: string }) {
+function parseBrand(brand) {
   return {
-    '@type': 'Brand' as const,
+    '@type': 'Brand',
     name: typeof brand === 'string' ? brand : brand.name,
   }
 }
@@ -187,24 +185,20 @@ export const parseToJsonLD = ({
   useImagesArray,
   disableAggregateOffer,
   gtinValue,
-}: ParseToJsonLDParams): ProductData | null => {
+}) => {
+  // Validar que product y selectedItem existan
   if (!product || !selectedItem) {
     return null
   }
 
-  const images = selectedItem.images || []
-  const { brand } = product
-  const name = product.productName
-
-  if (!name || !brand) {
-    return null
-  }
+  const images = selectedItem ? selectedItem.images : []
+  const brand = product.brand || ''
+  const name = product.productName || ''
 
   const mpn =
     selectedItem?.referenceId?.[0]?.Value ||
     product?.productReference ||
-    product?.productId ||
-    ''
+    product?.productId
 
   const offers = composeAggregateOffer(product, currency, {
     decimals,
@@ -221,33 +215,33 @@ export const parseToJsonLD = ({
 
   const category = getCategoryName(product)
 
-  const rawGTIN = selectedItem?.[gtinValue || ''] || null
+  const rawGTIN = selectedItem?.[gtinValue] || null
   const gtin = formatGTIN(rawGTIN)
 
-  const productUrl = `${baseUrl}/${product.linkText}/p`
-
-  const productLD: ProductData = {
+  const productLD = {
     '@context': 'https://schema.org/',
     '@type': 'Product',
-    '@id': productUrl,
+    '@id': `${baseUrl}/${product.linkText}`,
     name,
     brand: parseBrand(brand),
     image: useImagesArray
-      ? images.map((el: { imageUrl: string }) => el.imageUrl)
+      ? images.map((el) => el.imageUrl)
       : images[0]?.imageUrl || null,
     description: product.metaTagDescription || product.description || '',
     mpn,
     sku: selectedItem?.itemId || null,
-    category: category || null,
+    category,
     offers: disableOffers ? null : offers,
     gtin,
-    url: productUrl,
   }
 
   return productLD
 }
 
-function StructuredData({ product, selectedItem }: StructuredDataProps) {
+function StructuredData() {
+  
+  const { product, selectedItem } = useProduct()
+
   const {
     culture: { currency },
   } = useRuntime()
@@ -261,6 +255,11 @@ function StructuredData({ product, selectedItem }: StructuredDataProps) {
     disableAggregateOffer,
     gtinValue,
   } = useAppSettings()
+
+  // Validar que product y selectedItem existan
+  if (!product || !selectedItem) {
+    return null
+  }
 
   const productLD = parseToJsonLD({
     product,
@@ -279,21 +278,19 @@ function StructuredData({ product, selectedItem }: StructuredDataProps) {
     return null
   }
 
-  useEffect(() => {
-    const existingScript = document.querySelector(`script[data-jsonld-id="${productLD['@id']}"]`)
-    if (existingScript) {
-      existingScript.remove()
-    }
-  }, [productLD['@id']])
 
   return (
     <Helmet>
-      <script 
-        {...jsonLdScriptProps(productLD as any)}
-        data-jsonld-id={productLD['@id']}
-      />
+      <script type="application/ld+json" id="pumaindustrial-structured-data-product">
+        {JSON.stringify(productLD)}
+      </script>
     </Helmet>
   )
 }
 
-export default memo(StructuredData) 
+StructuredData.propTypes = {
+  product: PropTypes.object,
+  selectedItem: PropTypes.object,
+}
+
+export default memo(StructuredData)

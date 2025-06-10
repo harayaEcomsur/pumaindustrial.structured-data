@@ -1,8 +1,7 @@
 import React from 'react'
-import { Helmet } from 'react-helmet'
-import { WebSite } from 'schema-dts'
+import { Helmet } from 'vtex.render-runtime'
+import { WebSite, WithContext } from 'schema-dts'
 import { helmetJsonLdProp } from 'react-schemaorg'
-
 import { getBaseUrl } from './modules/baseUrl'
 
 interface Props {
@@ -12,23 +11,26 @@ interface Props {
 function SearchAction({ searchTermPath }: Props) {
   const baseUrl = getBaseUrl()
   const path = !searchTermPath ? '/' : searchTermPath
+  const target = path === '/' 
+    ? `{search_term_string}` 
+    : `${baseUrl}${path}{search_term_string}?map=ft`
+
+  const websiteSchema: WithContext<WebSite> = {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: 'Puma Safety',
+    url: baseUrl,
+    potentialAction: {
+      '@type': 'SearchAction',
+      target,
+      // @ts-expect-error 'query-input' es una propiedad válida de SearchAction según schema.org pero no está en los tipos
+      'query-input': 'required name=search_term_string',
+    },
+  }
 
   return (
     <Helmet
-      script={[
-        helmetJsonLdProp<WebSite>({
-          '@context': 'https://schema.org',
-          '@type': 'WebSite',
-          name: 'Puma Safety',
-          url: baseUrl,
-          potentialAction: {
-            '@type': 'SearchAction',
-            target: path === '/' ? `{search_term_string}` : `${baseUrl}${path}{search_term_string}?map=ft`,
-            // @ts-expect-error it's a valid property
-            'query-input': 'required name=search_term_string',
-          },
-        }),
-      ]}
+      script={[helmetJsonLdProp<WebSite>(websiteSchema)]}
     />
   )
 }
