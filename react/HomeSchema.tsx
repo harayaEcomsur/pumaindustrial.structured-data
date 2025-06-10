@@ -49,10 +49,10 @@ const HomeSchema: FC<Props> = () => {
 
   return (
     <Helmet>
-      <script type="application/ld+json">
+      <script type="application/ld+json" id="pumaindustrial-structured-data-website">
         {JSON.stringify(websiteSchema)}
       </script>
-      <script type="application/ld+json">
+      <script type="application/ld+json" id="pumaindustrial-structured-data-organization">
         {JSON.stringify(organizationSchema)}
       </script>
     </Helmet>
