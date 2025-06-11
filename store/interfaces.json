@@ -4,5 +4,8 @@
   },
   "product-structured-data": {
     "component": "Product"
+  },
+  "product-list-structured-data": {
+    "component": "ProductListSchema"
   }
 } 

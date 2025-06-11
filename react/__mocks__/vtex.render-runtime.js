@@ -14,13 +14,13 @@ export const useRuntime = () => {
 
 export const Helmet = ({ children, script }) => {
   if (script) {
-    return (
-      <div>
+  return (
+    <div>
         {script.map((s, i) => (
           <script key={i} {...s} />
         ))}
-      </div>
-    )
+    </div>
+  )
   }
   return <div>{children}</div>
 }

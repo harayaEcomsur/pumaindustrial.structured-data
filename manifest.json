@@ -19,7 +19,11 @@
     "vtex.render-runtime": "8.x",
     "vtex.apps-graphql": "3.x",
     "vtex.store": "2.x",
-    "vtex.product-context": "0.x"
+    "vtex.product-context": "0.x",
+    "vtex.search-page-context": "0.x",
+    "vtex.product-list-context": "0.x",
+    "vtex.search-result": "3.x",
+    "vtex.store-components": "3.x"
   },
   "vtexSSR": {
     "priority": 0
@@ -33,6 +37,16 @@
     "product": {
       "blocks": [
         "product-structured-data"
+      ]
+    },
+    "search": {
+      "blocks": [
+        "product-list-structured-data"
+      ]
+    },
+    "category": {
+      "blocks": [
+        "product-list-structured-data"
       ]
     }
   },

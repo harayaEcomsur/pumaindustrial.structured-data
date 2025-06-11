@@ -1,5 +1,5 @@
 import React from 'react'
-import { jsonLdScriptProps } from 'react-schemaorg'
+//import { jsonLdScriptProps } from 'react-schemaorg'
 import { ItemList, WithContext, ListItem } from 'schema-dts'
 import { useRuntime } from 'vtex.render-runtime'
 
@@ -60,6 +60,9 @@ export function getProductList({
 }
 
 function ProductList({ products }: Props) {
+  console.log('ProductList mounted')
+  console.log('ProductList products:', products)
+
   const {
     culture: { currency },
   } = useRuntime()
@@ -73,11 +76,18 @@ function ProductList({ products }: Props) {
     products,
   })
 
+  console.log('ProductList LD:', productListLD)
+
   if (!productListLD) {
+    console.log('No productListLD generated')
     return null
   }
 
-  return <script {...jsonLdScriptProps<ItemList>(productListLD)} />
+  return (
+    <script type="application/ld+json" id="product-list-schema">
+      {JSON.stringify(productListLD)}
+    </script>
+  )
 }
 
 export default ProductList
