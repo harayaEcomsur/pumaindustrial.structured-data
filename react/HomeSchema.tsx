@@ -1,4 +1,4 @@
-import React, { FC, useEffect } from 'react'
+import React, { FC, useLayoutEffect, useEffect } from 'react'
 import { Helmet } from 'vtex.render-runtime'
 import useAppSettings from './hooks/useAppSettings'
 import { getBaseUrl } from './modules/baseUrl'
@@ -47,24 +47,32 @@ const HomeSchema: FC<Props> = () => {
     }
   }
 
-  useEffect(() => {
-    // Esperar a que el DOM esté completamente cargado
-    const observer = new MutationObserver(() => {
-      const scripts = document.querySelectorAll('script[type="application/ld+json"]')
-      scripts.forEach(script => {
-        if (!script.id) {
-          script.remove()
-        }
-      })
+  const removeUnwantedScripts = () => {
+    const scripts = document.querySelectorAll('script[type="application/ld+json"]')
+    scripts.forEach(script => {
+      if (!script.id) {
+        script.remove()
+      }
     })
+  }
 
-    // Observar cambios en el head
+  useLayoutEffect(() => {
+    removeUnwantedScripts()
+    const observer = new MutationObserver(removeUnwantedScripts)
     observer.observe(document.head, {
       childList: true,
       subtree: true
     })
+    return () => observer.disconnect()
+  }, [])
 
-    // Limpiar el observer cuando el componente se desmonte
+  useEffect(() => {
+    removeUnwantedScripts()
+    const observer = new MutationObserver(removeUnwantedScripts)
+    observer.observe(document.head, {
+      childList: true,
+      subtree: true
+    })
     return () => observer.disconnect()
   }, [])
 
