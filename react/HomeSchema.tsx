@@ -1,4 +1,4 @@
-import React, { FC } from 'react'
+import React, { FC, useEffect } from 'react'
 import { Helmet } from 'vtex.render-runtime'
 import useAppSettings from './hooks/useAppSettings'
 import { getBaseUrl } from './modules/baseUrl'
@@ -47,13 +47,34 @@ const HomeSchema: FC<Props> = () => {
     }
   }
 
+  useEffect(() => {
+    // Esperar a que el DOM esté completamente cargado
+    const observer = new MutationObserver(() => {
+      const scripts = document.querySelectorAll('script[type="application/ld+json"]')
+      scripts.forEach(script => {
+        if (!script.id) {
+          script.remove()
+        }
+      })
+    })
+
+    // Observar cambios en el head
+    observer.observe(document.head, {
+      childList: true,
+      subtree: true
+    })
+
+    // Limpiar el observer cuando el componente se desmonte
+    return () => observer.disconnect()
+  }, [])
+
   return (
     <Helmet>
-      <script type="application/ld+json" id="pumaindustrial-structured-data-website">
-        {JSON.stringify(websiteSchema)}
-      </script>
       <script type="application/ld+json" id="pumaindustrial-structured-data-organization">
         {JSON.stringify(organizationSchema)}
+      </script>
+      <script type="application/ld+json" id="pumaindustrial-structured-data-website">
+        {JSON.stringify(websiteSchema)}
       </script>
     </Helmet>
   )
